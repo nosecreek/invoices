@@ -5,7 +5,6 @@ import * as uuid from "uuid";
 import { useRouter } from "next/router";
 
 const Invoice = ({ invoice }: { invoice: Invoice }) => {
-  console.log(invoice);
   return <DisplayInvoice invoice={invoice} />;
 };
 

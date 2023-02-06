@@ -1,8 +1,11 @@
-import { Button } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import Link from "next/link";
+import DeleteIcon from "@mui/icons-material/Delete";
+import axios from "axios";
+import { useState } from "react";
 
 export interface InvoiceProps {
-  invoices: [Invoice];
+  invoices: Invoice[];
 }
 
 export interface Invoice {
@@ -24,7 +27,21 @@ export interface Service {
 }
 
 const InvoiceList = ({ invoices }: InvoiceProps) => {
-  console.log(invoices);
+  const [invoiceData, setInvoiceDate] = useState(invoices);
+
+  const deleteInvoice = async (id: string) => {
+    if (window.confirm("Delete This Invoice?")) {
+      const result = await axios.delete("/api/item", {
+        data: { id: id },
+      });
+
+      if (result.status === 204) {
+        const newInvoices = invoiceData.filter((i) => i.id.S !== id);
+        setInvoiceDate(newInvoices);
+      }
+    }
+  };
+
   return (
     <div>
       <p>
@@ -33,12 +50,22 @@ const InvoiceList = ({ invoices }: InvoiceProps) => {
         </Button>
       </p>
       <ul>
-        {invoices.map((invoice: Invoice) => (
+        {invoiceData.map((invoice: Invoice) => (
           <li key={invoice.id.S}>
             <Link href={`/invoice/${invoice.id.S}`}>
               {invoice.CustomerName.S} -{" "}
-              {new Date(parseInt(invoice.InvoiceDate.N)).toLocaleDateString()}
-            </Link>
+              {new Date(parseInt(invoice.InvoiceDate.N)).toLocaleDateString(
+                "en-US",
+                {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                }
+              )}
+            </Link>{" "}
+            <IconButton onClick={async () => await deleteInvoice(invoice.id.S)}>
+              <DeleteIcon />
+            </IconButton>
           </li>
         ))}
       </ul>
