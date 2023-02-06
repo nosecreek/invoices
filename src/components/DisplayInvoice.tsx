@@ -6,13 +6,12 @@ import { Invoice } from "./InvoiceList";
 import {
   Box,
   Button,
-  IconButton,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   TableRow,
+  TextField,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import {
@@ -24,17 +23,17 @@ import {
   GridRowsProp,
 } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EventRepeatIcon from "@mui/icons-material/EventRepeat";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { ADDR1, ADDR2, BIZNAME, NAME, PAYMENTLINK, PHONE } from "@/userInfo";
+import { DatePicker } from "@mui/x-date-pickers";
 
 const DisplayInvoice = ({ invoice }: { invoice: Invoice }) => {
   const [customerName, setCustomerName] = useState(invoice.CustomerName.S);
   const [paid, setPaid] = useState(invoice?.Paid?.N || "0");
   const [date, setDate] = useState(
-    invoice.InvoiceDate.N || `${new Date().getTime()}`
+    new Date(parseInt(invoice?.InvoiceDate?.N || `${new Date().getTime()}`))
   );
   const [print, setPrint] = useState(false);
   const [rows, setRows] = useState<GridRowsProp>(
@@ -89,7 +88,7 @@ const DisplayInvoice = ({ invoice }: { invoice: Invoice }) => {
     const invoiceData = {
       id: { S: invoice.id.S },
       CustomerName: { S: customerName },
-      InvoiceDate: { N: `${date}` },
+      InvoiceDate: { N: `${date.getTime()}` },
       Services: {
         L: rows.map((r) => ({
           M: {
@@ -203,18 +202,22 @@ const DisplayInvoice = ({ invoice }: { invoice: Invoice }) => {
                 <TableRow>
                   <TableCell>Date</TableCell>
                   <TableCell>
-                    {new Date(parseInt(date)).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}{" "}
-                    <IconButton
-                      aria-label="Reset Date"
-                      onClick={() => setDate(`${new Date().getTime()}`)}
+                    <DatePicker
+                      label="Invoice Date"
+                      value={date}
                       className="no-print"
-                    >
-                      <EventRepeatIcon />
-                    </IconButton>
+                      onChange={(newValue) => {
+                        setDate(newValue || new Date());
+                      }}
+                      renderInput={(params) => <TextField {...params} />}
+                    />
+                    <span className="only-print">
+                      {date.toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </span>
                   </TableCell>
                 </TableRow>
                 <TableRow>

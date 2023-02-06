@@ -34,9 +34,17 @@ img {
   outline: none;
 }
 
+.only-print {
+  display: none;
+}
+
 @media print {
   .no-print {
     display: none;
+  }
+
+  .only-print {
+    display: block;
   }
 }
 
